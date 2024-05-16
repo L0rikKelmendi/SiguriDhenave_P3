@@ -9,11 +9,16 @@ Project Title: Two-Factor Authentication (2FA) System
 Contributors:
 
 Brela
+
 Blerton
+
 Pashtrik
+
 Lorik
 
-Supervisor: Prof. Blerim Rexha & Ass. Msc. Mergim Hoti
+Supervisor: Prof. Blerim Rexha
+&
+Ass. Msc. Mergim Hoti
 
 ## Description
 
