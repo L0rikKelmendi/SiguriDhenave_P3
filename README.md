@@ -1,24 +1,26 @@
 🛸 🌎　°　　🌓　•　　.°•　🚀 ✯ 　　　★　*　　　　　°　🛰 　°·　　🪐 .　　　•　° ★　• ☄ 
 ▁▂▃▄▅▆▇▇▆▅▄▃▁▂▁▂▃▄▅▆▇▇▆▅▄▃▁▂
 
-University of Prishtina "Hasan Prishtina"
+University of Prishtina " Hasan Prishtina '
 Faculty of Electrical and Computer Engineering
 
 Project Title: Two-Factor Authentication (2FA) System
 
-Contributors:
+**Contributors:**
 
-Brela
+_Brela_,
 
-Blerton
+_Blerton_,
 
-Pashtrik
+_Pashtrik_,
 
-Lorik
+_Lorik_.
 
-Supervisor: Prof. Blerim Rexha
+**Supervisor:**
+
+_Prof. Blerim Rexha
 &
-Ass. Msc. Mergim Hoti
+Ass. Msc. Mergim Hoti_.
 
 ## Description
 
