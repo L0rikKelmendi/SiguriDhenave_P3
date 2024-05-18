@@ -29,3 +29,18 @@ def generate_qr_code(secret_key, user_email):
     img = qrcode.make(provision_uri)
     img.show()
 
+def register_user(email):
+    """Register a new user."""
+    if email in users_db:
+        print("User already exists!")
+        return
+    secret_key = generate_secret_key()
+    users_db[email] = secret_key
+    backup_codes = generate_backup_codes()
+    backup_codes_db[email] = backup_codes
+    print(f"User {email} registered with secret key: {secret_key}")
+    print("Backup Codes:")
+    for code in backup_codes:
+        print(code)
+    print("Generating QR Code for 2FA setup...")
+    generate_qr_code(secret_key, email)
