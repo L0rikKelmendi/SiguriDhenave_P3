@@ -4,7 +4,7 @@ import random
 import string
 import time
 
-# Simulated database
+# Databaza e simuluar
 users_db = {}
 backup_codes_db = {}
 failed_attempts = {}
