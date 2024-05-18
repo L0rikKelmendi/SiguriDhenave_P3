@@ -44,3 +44,11 @@ def register_user(email):
         print(code)
     print("Generating QR Code for 2FA setup...")
     generate_qr_code(secret_key, email)
+    
+    def verify_totp(email, provided_totp):
+    """Verify the provided TOTP against the current TOTP for the secret key."""
+    if email not in users_db:
+        return False
+    secret_key = users_db[email]
+    totp = pyotp.TOTP(secret_key)
+    return totp.verify(provided_totp)
