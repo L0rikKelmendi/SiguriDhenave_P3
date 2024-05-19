@@ -111,3 +111,11 @@ def show_welcome_message(username):
     welcome_label.pack()
     close_button = tk.Button(welcome_window, text="Close", command=welcome_window.destroy)
     close_button.pack(pady=10)
+
+def register_user_gui():
+    username = simpledialog.askstring("Register", "Enter username:")
+    password = simpledialog.askstring("Register", "Enter password:", show='*')
+    phone_number = simpledialog.askstring("Register", "Enter phone number:")
+    if username and password and phone_number:
+        register_user(username, password, phone_number)
+
