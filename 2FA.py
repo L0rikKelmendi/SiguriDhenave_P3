@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime
+from sms import email_alert  # Importing the email_alert function
 
 # Emri i skedarit JSON për ruajtjen e të dhënave të përdoruesve
 USER_DATA_FILE = 'users.json'
@@ -31,7 +32,7 @@ def write_user_data(data):
         json.dump(data, file, indent=4)
 
 # Funksion për të regjistruar një përdorues të ri
-def register_user(username, password, phone_number):
+def register_user(username, password, email):
     user_data = read_user_data()
     if username in user_data:
         messagebox.showerror("Error", f"User {username} already exists.")
@@ -41,14 +42,13 @@ def register_user(username, password, phone_number):
     hardware_token_secret = b64encode(get_random_bytes(32)).decode('utf-8')
     user_data[username] = {
         'password': password,
-        'phone_number': phone_number,
+        'email': email,
         'totp_secret': totp_secret,
         'hardware_token_secret': hardware_token_secret
     }
     write_user_data(user_data)
     generate_totp_qr(username)
     messagebox.showinfo("Success", f"User {username} registered successfully. Scan the QR code for TOTP setup.")
-
 
 # Funksion për të gjeneruar dhe verifikuar TOTP
 def generate_totp_qr(username):
@@ -60,8 +60,8 @@ def generate_totp_qr(username):
     secret = user_data[username]['totp_secret']
     totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(name=username, issuer_name="YourApp")
     img = qrcode.make(totp_uri)
-    img.save(f"{username}_totp.png")
-    messagebox.showinfo("Success", f"QR Code saved as {username}_totp.png. Scan this QR code with your TOTP app.")
+    img.save(f"{username}.png")
+    messagebox.showinfo("Success", f"QR Code saved as {username}.png. Scan this QR code with your TOTP app.")
 
 def verify_totp(username, otp):
     user_data = read_user_data()
@@ -104,7 +104,6 @@ def login(username, password, otp=None, token=None):
         show_welcome_message(username)
     else:
         messagebox.showerror("Error", "Invalid OTP or hardware token.")
-        
 
 # Funksion për të treguar një mesazh mirëseardhjeje
 def show_welcome_message(username):
@@ -114,7 +113,6 @@ def show_welcome_message(username):
     welcome_label.pack()
     close_button = tk.Button(welcome_window, text="Close", command=welcome_window.destroy)
     close_button.pack(pady=10)
-
 
 # Funksionet për GUI
 def register_user_gui():
