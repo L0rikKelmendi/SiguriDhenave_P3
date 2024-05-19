@@ -119,3 +119,9 @@ def register_user_gui():
     if username and password and phone_number:
         register_user(username, password, phone_number)
 
+def login_gui():
+    username = simpledialog.askstring("Login", "Enter username:")
+    password = simpledialog.askstring("Login", "Enter password:", show='*')
+    if username and password:
+        show_authentication_choice(username, password)
+
