@@ -10,7 +10,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from datetime import datetime
-from sms import email_alert  # Importing the email_alert function
+from sms import email_alert  # Importing the email_alert function prej fajllit sms.py
 
 # Emri i skedarit JSON për ruajtjen e të dhënave të përdoruesve
 USER_DATA_FILE = 'users.json'
@@ -38,6 +38,7 @@ def register_user(username, password, email):
         messagebox.showerror("Error", f"User {username} already exists.")
         return
     
+    # Gjeneron sekrete për TOTP dhe hardware token
     totp_secret = pyotp.random_base32()
     hardware_token_secret = b64encode(get_random_bytes(32)).decode('utf-8')
     user_data[username] = {
@@ -57,6 +58,7 @@ def generate_totp_qr(username):
         messagebox.showerror("Error", f"User {username} not found.")
         return
     
+    # Gjeneron URI dhe QR kodin për TOTP
     secret = user_data[username]['totp_secret']
     totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(name=username, issuer_name="YourApp")
     img = qrcode.make(totp_uri)
@@ -78,15 +80,16 @@ def verify_and_update_hardware_token(username, token):
     if username not in user_data:
         return False
     
+    # Verifikon dhe përditëson token hardware
     secret = user_data[username]['hardware_token_secret']
     hmac_obj = hmac.new(secret.encode(), token.encode(), hashlib.sha256)
     if hmac.compare_digest(hmac_obj.hexdigest(), token):
-        # Generate a new hardware token secret and update the user data
+        # Gjeneron një sekret të ri për token hardware dhe përditëson të dhënat e përdoruesit
         new_hardware_token_secret = b64encode(get_random_bytes(32)).decode('utf-8')
         user_data[username]['hardware_token_secret'] = new_hardware_token_secret
         write_user_data(user_data)
         
-        # Log the token update
+        # Regjistron përditësimin e token hardware
         log_hardware_token_update(username, new_hardware_token_secret)
         return True
     return False
@@ -98,6 +101,7 @@ def login(username, password, otp=None, token=None):
         messagebox.showerror("Error", "Invalid username or password.")
         return
     
+    # Verifikon OTP ose token hardware
     if otp and verify_totp(username, otp):
         show_welcome_message(username)
     elif token and verify_and_update_hardware_token(username, token):
@@ -155,8 +159,6 @@ def login_gui():
     login_button.pack(pady=10)
 
     login_dialog.mainloop()
-
-
 
 def show_authentication_choice(username, password):
     auth_window = tk.Toplevel(root)
