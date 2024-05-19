@@ -62,3 +62,12 @@ def generate_totp_qr(username):
     img = qrcode.make(totp_uri)
     img.save(f"{username}_totp.png")
     messagebox.showinfo("Success", f"QR Code saved as {username}_totp.png. Scan this QR code with your TOTP app.")
+
+def verify_totp(username, otp):
+    user_data = read_user_data()
+    if username not in user_data:
+        return False
+    
+    secret = user_data[username]['totp_secret']
+    totp = pyotp.TOTP(secret)
+    return totp.verify(otp)
