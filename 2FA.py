@@ -120,25 +120,83 @@ def show_welcome_message(username):
 def register_user_gui():
     username = simpledialog.askstring("Register", "Enter username:")
     password = simpledialog.askstring("Register", "Enter password:", show='*')
-    phone_number = simpledialog.askstring("Register", "Enter phone number:")
-    if username and password and phone_number:
-        register_user(username, password, phone_number)
+    email = simpledialog.askstring("Register", "Enter email:")
+    if username and password and email:
+        register_user(username, password, email)
 
 def login_gui():
-    username = simpledialog.askstring("Login", "Enter username:")
-    password = simpledialog.askstring("Login", "Enter password:", show='*')
-    if username and password:
-        show_authentication_choice(username, password)
+    login_dialog = tk.Toplevel(root)
+    login_dialog.title("Login")
+
+    tk.Label(login_dialog, text="Enter username:").pack(pady=5)
+    username_entry = tk.Entry(login_dialog)
+    username_entry.pack(pady=5)
+
+    tk.Label(login_dialog, text="Enter password:").pack(pady=5)
+    password_entry = tk.Entry(login_dialog, show='*')
+    password_entry.pack(pady=5)
+
+    def on_login():
+        username = username_entry.get()
+        password = password_entry.get()
+
+        if username and password:
+            user_data = read_user_data()
+            if username in user_data and user_data[username]['password'] == password:
+                email = user_data[username]['email']
+                email_subject = "Login Attempt"
+                attachment_filename = f"{username}.png"
+                attachments = [attachment_filename]
+                email_alert(email_subject, "", email, attachments)  # Email body left empty
+                login_dialog.destroy()
+                show_authentication_choice(username, password)
+            else:
+                messagebox.showerror("Error", "Invalid username or password.")
+
+    login_button = tk.Button(login_dialog, text="Login", command=on_login)
+    login_button.pack(pady=10)
+
+    login_dialog.mainloop()
 
 
-# Shfaq zgjedhjen e autentikimit për përdoruesin
+
 def show_authentication_choice(username, password):
-    # Krijimi i dritares së re për autentikim nën dritaren kryesore
     auth_window = tk.Toplevel(root)
-    auth_window.title("Zgjidhni Metodën e Autentikimit")
+    auth_window.title("Choose Authentication Method")
+    
+    totp_button = tk.Button(auth_window, text="Use TOTP", 
+                            command=lambda: authenticate_with_totp(auth_window, username, password))
+    hardware_button = tk.Button(auth_window, text="Use Hardware Token", 
+                                command=lambda: authenticate_with_hardware_token(auth_window, username, password))
+    
+    totp_button.pack(pady=10)
+    hardware_button.pack(pady=10)
 
+def authenticate_with_totp(auth_window, username, password):
+    auth_window.destroy()
+    otp = simpledialog.askstring("TOTP Authentication", "Enter TOTP:")
+    if otp:
+        login(username, password, otp=otp)
 
-# Krijimi i butonit për përdorimin e TOTP
-totp_button = tk.Button(auth_window, text="Përdor TOTP",       
-         command=lambda: authenticate_with_totp(auth_window, username, password))
+def authenticate_with_hardware_token(auth_window, username, password):
+    auth_window.destroy()
+    token = simpledialog.askstring("Hardware Token Authentication", "Enter hardware token:")
+    if token:
+        login(username, password, token=token)
 
+# Funksion për të regjistruar përditësimet e hardware token
+def log_hardware_token_update(username, new_token):
+    with open(LOG_FILE, 'a') as log_file:
+        log_file.write(f"{datetime.now()}: {username} updated hardware token to {new_token}\n")
+
+# Krijimi i dritares kryesore të GUI
+root = tk.Tk()
+root.title("2FA Authentication System")
+
+register_button = tk.Button(root, text="Register", command=register_user_gui)
+login_button = tk.Button(root, text="Login", command=login_gui)
+
+register_button.pack(pady=10)
+login_button.pack(pady=10)
+
+root.mainloop()
