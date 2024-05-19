@@ -137,3 +137,8 @@ def show_authentication_choice(username, password):
     auth_window = tk.Toplevel(root)
     auth_window.title("Zgjidhni Metodën e Autentikimit")
 
+
+# Krijimi i butonit për përdorimin e TOTP
+totp_button = tk.Button(auth_window, text="Përdor TOTP",       
+         command=lambda: authenticate_with_totp(auth_window, username, password))
+
