@@ -85,3 +85,23 @@ def verify_and_update_hardware_token(username, token):
         new_hardware_token_secret = b64encode(get_random_bytes(32)).decode('utf-8')
         user_data[username]['hardware_token_secret'] = new_hardware_token_secret
         write_user_data(user_data)
+        
+        # Log the token update
+        log_hardware_token_update(username, new_hardware_token_secret)
+        return True
+    return False
+
+# Funksion për të bërë login dhe për të treguar një mesazh mirëseardhjeje
+def login(username, password, otp=None, token=None):
+    user_data = read_user_data()
+    if username not in user_data or user_data[username]['password'] != password:
+        messagebox.showerror("Error", "Invalid username or password.")
+        return
+    
+    if otp and verify_totp(username, otp):
+        show_welcome_message(username)
+    elif token and verify_and_update_hardware_token(username, token):
+        show_welcome_message(username)
+    else:
+        messagebox.showerror("Error", "Invalid OTP or hardware token.")
+
