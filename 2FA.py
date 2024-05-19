@@ -104,4 +104,10 @@ def login(username, password, otp=None, token=None):
         show_welcome_message(username)
     else:
         messagebox.showerror("Error", "Invalid OTP or hardware token.")
-
+def show_welcome_message(username):
+    welcome_window = tk.Toplevel(root)
+    welcome_window.title("Welcome")
+    welcome_label = tk.Label(welcome_window, text=f"Welcome to Siguria e të Dhënave, {username}!", padx=20, pady=20)
+    welcome_label.pack()
+    close_button = tk.Button(welcome_window, text="Close", command=welcome_window.destroy)
+    close_button.pack(pady=10)
