@@ -1,54 +1,50 @@
 import pyotp
 import qrcode
-import random
-import string
-import time
+import json
+import os
+import hmac
+import hashlib
+from base64 import b64encode
+from Crypto.Random import get_random_bytes
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import simpledialog
+from datetime import datetime
 
-# Databaza e simuluar
-users_db = {}
-backup_codes_db = {}
-failed_attempts = {}
+# Emri i skedarit JSON për ruajtjen e të dhënave të përdoruesve
+USER_DATA_FILE = 'users.json'
+LOG_FILE = 'hardware_token_log.txt'
 
-# Rate limiting parameters
-TIME_WINDOW = 300  # 5 minutes in seconds
-MAX_ATTEMPTS = 3
-BLOCK_DURATION = 600  # 10 minutes in seconds
+# Funksion për të lexuar të dhënat e përdoruesve nga skedari JSON
+def read_user_data():
+    if not os.path.exists(USER_DATA_FILE):
+        return {}
+    try:
+        with open(USER_DATA_FILE, 'r') as file:
+            return json.load(file)
+    except json.JSONDecodeError:
+        return {}
 
-def generate_secret_key():
-    """Generate a unique secret key for a user."""
-    return pyotp.random_base32()
+# Funksion për të shkruar të dhënat e përdoruesve në skedarin JSON
+def write_user_data(data):
+    with open(USER_DATA_FILE, 'w') as file:
+        json.dump(data, file, indent=4)
 
-def generate_backup_codes():
-    """Generate a set of backup codes."""
-    return [''.join(random.choices(string.ascii_uppercase + string.digits, k=8)) for _ in range(5)]
-
-def generate_qr_code(secret_key, user_email):
-    """Generate a QR code based on the secret key."""
-    totp = pyotp.TOTP(secret_key)
-    provision_uri = totp.provisioning_uri(name=user_email, issuer_name="YourAppName")
-    img = qrcode.make(provision_uri)
-    img.show()
-
-def register_user(email):
-    """Register a new user."""
-    if email in users_db:
-        print("User already exists!")
+# Funksion për të regjistruar një përdorues të ri
+def register_user(username, password, phone_number):
+    user_data = read_user_data()
+    if username in user_data:
+        messagebox.showerror("Error", f"User {username} already exists.")
         return
-    secret_key = generate_secret_key()
-    users_db[email] = secret_key
-    backup_codes = generate_backup_codes()
-    backup_codes_db[email] = backup_codes
-    print(f"User {email} registered with secret key: {secret_key}")
-    print("Backup Codes:")
-    for code in backup_codes:
-        print(code)
-    print("Generating QR Code for 2FA setup...")
-    generate_qr_code(secret_key, email)
     
-    def verify_totp(email, provided_totp):
-    """Verify the provided TOTP against the current TOTP for the secret key."""
-    if email not in users_db:
-        return False
-    secret_key = users_db[email]
-    totp = pyotp.TOTP(secret_key)
-    return totp.verify(provided_totp)
+    totp_secret = pyotp.random_base32()
+    hardware_token_secret = b64encode(get_random_bytes(32)).decode('utf-8')
+    user_data[username] = {
+        'password': password,
+        'phone_number': phone_number,
+        'totp_secret': totp_secret,
+        'hardware_token_secret': hardware_token_secret
+    }
+    write_user_data(user_data)
+    generate_totp_qr(username)
+    messagebox.showinfo("Success", f"User {username} registered successfully. Scan the QR code for TOTP setup.")
