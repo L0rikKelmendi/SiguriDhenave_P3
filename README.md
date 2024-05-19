@@ -51,7 +51,7 @@ The project is developed in Python using Flask for the web framework and integra
 
 4. **Run the main Python script:**
     ```bash
-    python app.py
+    python 2FA.py
     ```
 
 5. **Follow the on-screen prompts:**
