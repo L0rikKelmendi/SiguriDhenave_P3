@@ -71,3 +71,17 @@ def verify_totp(username, otp):
     secret = user_data[username]['totp_secret']
     totp = pyotp.TOTP(secret)
     return totp.verify(otp)
+
+# Funksion për të verifikuar dhe përditësuar token hardware (YubiKey)
+def verify_and_update_hardware_token(username, token):
+    user_data = read_user_data()
+    if username not in user_data:
+        return False
+    
+    secret = user_data[username]['hardware_token_secret']
+    hmac_obj = hmac.new(secret.encode(), token.encode(), hashlib.sha256)
+    if hmac.compare_digest(hmac_obj.hexdigest(), token):
+        # Generate a new hardware token secret and update the user data
+        new_hardware_token_secret = b64encode(get_random_bytes(32)).decode('utf-8')
+        user_data[username]['hardware_token_secret'] = new_hardware_token_secret
+        write_user_data(user_data)
