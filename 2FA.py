@@ -104,6 +104,9 @@ def login(username, password, otp=None, token=None):
         show_welcome_message(username)
     else:
         messagebox.showerror("Error", "Invalid OTP or hardware token.")
+        
+
+# Funksion për të treguar një mesazh mirëseardhjeje
 def show_welcome_message(username):
     welcome_window = tk.Toplevel(root)
     welcome_window.title("Welcome")
@@ -112,6 +115,8 @@ def show_welcome_message(username):
     close_button = tk.Button(welcome_window, text="Close", command=welcome_window.destroy)
     close_button.pack(pady=10)
 
+
+# Funksionet për GUI
 def register_user_gui():
     username = simpledialog.askstring("Register", "Enter username:")
     password = simpledialog.askstring("Register", "Enter password:", show='*')
@@ -124,4 +129,11 @@ def login_gui():
     password = simpledialog.askstring("Login", "Enter password:", show='*')
     if username and password:
         show_authentication_choice(username, password)
+
+
+# Shfaq zgjedhjen e autentikimit për përdoruesin
+def show_authentication_choice(username, password):
+    # Krijimi i dritares së re për autentikim nën dritaren kryesore
+    auth_window = tk.Toplevel(root)
+    auth_window.title("Zgjidhni Metodën e Autentikimit")
 
